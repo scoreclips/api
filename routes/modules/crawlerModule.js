@@ -58,7 +58,7 @@ var generate_mongo_url = function(obj){
 }
 var mongourl = generate_mongo_url(mongo);
 var db;
-var dbName = 'videos';
+var dbName = 'videos_v2';
 
 require('mongodb').connect(mongourl, function(err, conn){
 	db = conn;

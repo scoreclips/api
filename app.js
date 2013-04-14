@@ -2,7 +2,7 @@ var express = require('express'),
     //account = require('./routes/account');
     //account = require('./routes/controllers/accountController');
     crawler = require('./routes/controllers/crawlerController');
-    var sleep = require('sleep');
+    //var sleep = require('sleep');
 
 var app = express.createServer();
 //var app = express();
@@ -32,12 +32,39 @@ app.listen(process.env.PORT || process.env.VCAP_APP_PORT || 3001, function(){
 
 //sleep.sleep(10);
 
-var periodtime = 12*60*60*1000;
+var periodtime = 1*60*60*1000;
 
 setInterval(function() {
 					crawler.crawler_24H();
                 }, periodtime );
 
+
+var http = require('http')
+  , url = require('url');
+ 
+function request(address, path) {
+    http.get({ host: address, path: path,port:80}, function(response) {
+        // The page has moved make new request
+        if (response.statusCode === 301) {
+            var newLocation = url.parse(response.headers.location).host;
+            console.log('We have to make new request ' + newLocation);
+            request(newLocation);
+        } else {
+            console.log("Response: %d", response.statusCode);
+            response.on('data', function(chunk) {
+                console.log('Body ' + chunk);
+            });
+        }
+    }).on('error', function(err) {
+        console.log('Error %s', err.message);
+    });
+}
+ 
+//request('www.google.com', '/search?ie=UTF-8&q=node');
+
+//request('24h.com.vn','/video-ban-thang-c297.html');
+
+//request('hn.24h.com.vn','/video-ban-thang/arsenal-norwich-danh-chiem-top-3-c297a535205.html');
 
 //app.listen(process.env.PORT || process.env.VCAP_APP_PORT || 3001);
 //console.log('Listening on port 3001...');
