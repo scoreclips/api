@@ -93,19 +93,19 @@ var parserVideoHTML_24H = function(stringHTML) {
 
 			if (arrTeamMatches != null) {
 				
-				results.teams = arrTeamMatches[1];
+				results.teams = arrTeamMatches[1].replace(/amp;/gi,"");
 				results.desciptions = arrTeamMatches[2];
 
 				rePattern = new RegExp(/(.*)\s[-,–]\s(.*)/);
 				arrTeamMatches = results.teams.match(rePattern);
 				if (arrTeamMatches != null) {
-					results.team1 = arrTeamMatches[1];
-					results.team2 = arrTeamMatches[2];
+					results.team1 = arrTeamMatches[1].replace(/amp;/gi,"");
+					results.team2 = arrTeamMatches[2].replace(/amp;/gi,"");
 				}
 				  
 				
 			} else {
-				results.teams = arrMatches[1];
+				results.teams = arrMatches[1].replace(/amp;/gi,"");
 			}
 			console.log("-----",stringList[i]);
 
@@ -139,46 +139,52 @@ var parserVideoHTML_24H = function(stringHTML) {
 				// case 2: <p><strong>Chung cuộc:</strong>&#160;Troyes 0-1 PSG</p>
 				// case 3: Tỷ số 1-6<br />
 				// case 4: Chung cuộc: 3-2 (tổng tỷ số 4-5 sau 2 lượt trận, Chelsea giành quyền vào bán kết)
+				// case 5: Kết quả 0-2
 				rePattern = new RegExp(/.*Tỉ số(.*)/);
 				arrMatches = stringList[i].match(rePattern);
 
+				var case1_3_5 = 0;
 				if (arrMatches != null) {
 					// case 1:
-					matchedString = arrMatches[1];
-					// get team1 team2 
-					rePattern = new RegExp(/(\d+-\d+)/);
-					arrTeamMatches = matchedString.match(rePattern);
-
-					if (arrTeamMatches != null) {
-						results.score = arrTeamMatches[1];
-					} else {
-						results.score = matchedString;
-					}
+					case1_3_5 = 1;
 					console.log("---score case1--",matchedString);
 				} else {
 					// case 3:
 					rePattern = new RegExp(/.*Tỷ số(.*)/);
 					arrMatches = stringList[i].match(rePattern);
 					if (arrMatches != null) {
-						matchedString = arrMatches[1];
-						// get team1 team2 
-						rePattern = new RegExp(/(\d+-\d+)/);
-						arrTeamMatches = matchedString.match(rePattern);
+						case1_3_5 = 3;
+						console.log("---score case3--",matchedString);
+					} else {
+						// case 5
+						rePattern = new RegExp(/.*Kết quả:(.*)/);
+						arrMatches = stringList[i].match(rePattern);
+						if (arrMatches != null) {
+							case1_3_5 = 5;
+							console.log("---score case5--",matchedString);
+						} 
+					}
+				}
 
+				if (case1_3_5 !=  0) {
+					matchedString = arrMatches[1];
+					rePattern = new RegExp(/(\d+-\d+)/);
+					arrTeamMatches = matchedString.match(rePattern);
+
+					if (results.score == null) {
 						if (arrTeamMatches != null) {
 							results.score = arrTeamMatches[1];
 						} else {
 							results.score = matchedString;
 						}
-						console.log("---score case3--",matchedString);
 					}
 				}
+
 				// case 1+2:
 				rePattern = new RegExp(/.*Chung cuộc(.*)/);
 				arrMatches = stringList[i].match(rePattern);
 				if (arrMatches != null) {
 					matchedString = arrMatches[1];
-					// get team1 team2 
 					rePattern = new RegExp(/(\d+-\d+)/);
 					arrTeamMatches = matchedString.match(rePattern);
 
@@ -195,13 +201,12 @@ var parserVideoHTML_24H = function(stringHTML) {
 				arrMatches = stringList[i].match(rePattern);
 				if (arrMatches != null) {
 					matchedString = arrMatches[1];
-					// get team1 team2 
 					rePattern = new RegExp(/(\d+-\d+)/);
 					arrTeamMatches = matchedString.match(rePattern);
 
 					if (arrTeamMatches != null) {
 						if (results.finalscore != null) {
-							results.core = results.finalscore;
+							results.score = results.finalscore;
 						}
 						results.finalscore = arrTeamMatches[1];
 
