@@ -191,7 +191,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 					if (arrTeamMatches != null) {
 						results.finalscore = arrTeamMatches[1];
 					} else {
-						results.finalscore = matchedString;
+						//results.finalscore = matchedString;
 					}
 					console.log("---score case1-2--",matchedString);
 				}
@@ -211,7 +211,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 						results.finalscore = arrTeamMatches[1];
 
 					} else {
-						results.finalscore = matchedString;
+						//results.finalscore = matchedString;
 					}
 					console.log("---score case1-2--",matchedString);
 				}
@@ -274,7 +274,8 @@ exports.crawler_24H = function() {
 	    console.log ("output----",o);
 
 	    if (o != null) {
-		    var searchKeys = o;
+		    var searchKeys = {};
+		    searchKeys.sourceURL = o.sourceURL;
 			//searchKeys.videoclips = undefined;
 			AM.findByMultipleFields(searchKeys,function(e, o1) {
 				if (o1.length == 0) {
@@ -285,10 +286,19 @@ exports.crawler_24H = function() {
 					AM.insertData(tableDB,o,function(e, o) {
 					});
 				} else {
-					// AM.insertData(tableDB,o,function(e, o) {
-					// });
-					console.log("--------already had video info",e,o1);
 					// already had video info
+					// update video list
+					o1.videoclips = o.videoclips;
+					o1.score = o.score;
+					o1.finalscore = o.finalscore;
+					o1.date = o.date;
+					o1.desciptions = o.desciptions;
+					o1.teams = o.teams;
+					o1.team1 = o.team1;
+					o1.team2 = o.team2;
+					console.log("--------already had video info--updating",e,o,o1);
+					AM.saveData(tableDB,o1,function(e, o2) {
+					});
 				}
 			});
 		}
