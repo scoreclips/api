@@ -126,14 +126,14 @@ var parserVideoHTML_24H = function(stringHTML) {
 			} else {
 				results.teams = arrMatches[1].replace(/amp;/gi,"");
 			}
-			console.log("-----",line);
+			console.log("-----get team1 team2:",line);
 
 		} else {
 
 			// clips
 			//flashWrite("/js/player24H2.swf?cID=297&file=http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_01.mp4,http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_02.mp4,http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_03.mp4&",500,447, "/", "http://anh.24h.com.vn/upload/2-2012/images/2012-05-21/24h_bongda_527x298.swf", "/");
 			// url
-			rePattern = new RegExp(/.*flashWrite\(\"\/js\/player24H2.swf\?cID=297\&file=(.*)/);
+			rePattern = new RegExp(/.*flashWrite\(\"\/js\/player24H2.swf\?cID=297.*file=(.*)/);
 			arrMatches = line.match(rePattern);
 
 			if (arrMatches != null) {
@@ -148,7 +148,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 						videoclips.push(arrMatches[1]);
 						results.date = arrMatches[2];
 					}
-					console.log("-----",clipList[clipIndex]);
+					console.log("-----clips:",clipList[clipIndex]);
 				}
 			}
 			else {
@@ -299,7 +299,7 @@ exports.crawler_24H = function() {
 			AM.findByMultipleFields(searchKeys,function(e, o1) {
 				if (o1.length == 0) {
 					// save to db
-					console.log("--------new",e);
+					console.log("--------new",o1);
 					var jsonDate = now.toJSON();
 					o.uptime = jsonDate;
 					AM.insertData(tableDB,o,function(e, o) {
@@ -315,7 +315,7 @@ exports.crawler_24H = function() {
 					o1.teams = o.teams;
 					o1.team1 = o.team1;
 					o1.team2 = o.team2;
-					console.log("--------already had video info--updating",e,o,o1);
+					console.log("c-updating",e,o,o1);
 					AM.saveData(tableDB,o1,function(e, o2) {
 					});
 				}
