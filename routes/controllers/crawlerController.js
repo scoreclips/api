@@ -10,6 +10,22 @@ var 	Crawler = require("simplecrawler");
 
 
 //////////////////--Helper--//////////////////
+var cleanHTMLString = function(inputString) {
+//  http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-10/Dortmund_Malaga_Mp4_0000000000000000000001.mp4,http:/video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-10/Dortmund_Malaga_Mp4_0000000000000000000002.mp4&"
+	
+	var result = inputString;
+	
+	result = inputString.replace(/amp;/gi,"");
+	result = inputString.replace(/\&quot;/gi,"\"");
+	result = inputString.replace(/\&quot;/gi,"\"");
+
+
+	return result;
+}
+
+// var test = cleanHTMLString("Bayern - Wolfsburg: Nuôi mộng &quot;ăn 3&quot;");
+// console.log("--------",test);
+
 var parserVideoURL_24H = function(stringURL) {
 //  http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-10/Dortmund_Malaga_Mp4_0000000000000000000001.mp4,http:/video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-10/Dortmund_Malaga_Mp4_0000000000000000000002.mp4&"
 	
@@ -63,6 +79,7 @@ var parserVideoURL_24H = function(stringURL) {
 
 }
 
+
 var parserVideoHTML_24H = function(stringHTML) {
 //  http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-10/Dortmund_Malaga_Mp4_0000000000000000000001.mp4,http:/video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-10/Dortmund_Malaga_Mp4_0000000000000000000002.mp4&"
 	
@@ -83,7 +100,9 @@ var parserVideoHTML_24H = function(stringHTML) {
 		// or 
 		// <meta content="Ro vẩu lốp bóng top 10 bàn thắng đẹp tuần" itemprop="headline"/> 
 		var rePattern = new RegExp(/.*<meta content=\"(.*)\" itemprop="headline"\/>/);
-		var arrMatches = stringList[i].match(rePattern);
+		var line = cleanHTMLString(stringList[i]);
+		var arrMatches = line.match(rePattern);
+
 
 		if (arrMatches != null) {
 			var matchedString = arrMatches[1];
@@ -93,21 +112,21 @@ var parserVideoHTML_24H = function(stringHTML) {
 
 			if (arrTeamMatches != null) {
 				
-				results.teams = arrTeamMatches[1].replace(/amp;/gi,"");
+				results.teams = cleanHTMLString(arrTeamMatches[1]);
 				results.desciptions = arrTeamMatches[2];
 
 				rePattern = new RegExp(/(.*)\s[-,–]\s(.*)/);
 				arrTeamMatches = results.teams.match(rePattern);
 				if (arrTeamMatches != null) {
-					results.team1 = arrTeamMatches[1].replace(/amp;/gi,"");
-					results.team2 = arrTeamMatches[2].replace(/amp;/gi,"");
+					results.team1 = cleanHTMLString(arrTeamMatches[1]);
+					results.team2 = cleanHTMLString(arrTeamMatches[2]);
 				}
 				  
 				
 			} else {
 				results.teams = arrMatches[1].replace(/amp;/gi,"");
 			}
-			console.log("-----",stringList[i]);
+			console.log("-----",line);
 
 		} else {
 
@@ -115,7 +134,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 			//flashWrite("/js/player24H2.swf?cID=297&file=http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_01.mp4,http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_02.mp4,http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_03.mp4&",500,447, "/", "http://anh.24h.com.vn/upload/2-2012/images/2012-05-21/24h_bongda_527x298.swf", "/");
 			// url
 			rePattern = new RegExp(/.*flashWrite\(\"\/js\/player24H2.swf\?cID=297\&file=(.*)/);
-			arrMatches = stringList[i].match(rePattern);
+			arrMatches = line.match(rePattern);
 
 			if (arrMatches != null) {
 
@@ -141,7 +160,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 				// case 4: Chung cuộc: 3-2 (tổng tỷ số 4-5 sau 2 lượt trận, Chelsea giành quyền vào bán kết)
 				// case 5: Kết quả 0-2
 				rePattern = new RegExp(/.*Tỉ số(.*)/);
-				arrMatches = stringList[i].match(rePattern);
+				arrMatches = line.match(rePattern);
 
 				var case1_3_5 = 0;
 				if (arrMatches != null) {
@@ -151,14 +170,14 @@ var parserVideoHTML_24H = function(stringHTML) {
 				} else {
 					// case 3:
 					rePattern = new RegExp(/.*Tỷ số(.*)/);
-					arrMatches = stringList[i].match(rePattern);
+					arrMatches = line.match(rePattern);
 					if (arrMatches != null) {
 						case1_3_5 = 3;
 						console.log("---score case3--",matchedString);
 					} else {
 						// case 5
 						rePattern = new RegExp(/.*Kết quả:(.*)/);
-						arrMatches = stringList[i].match(rePattern);
+						arrMatches = line.match(rePattern);
 						if (arrMatches != null) {
 							case1_3_5 = 5;
 							console.log("---score case5--",matchedString);
@@ -182,7 +201,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 
 				// case 1+2:
 				rePattern = new RegExp(/.*Chung cuộc(.*)/);
-				arrMatches = stringList[i].match(rePattern);
+				arrMatches = line.match(rePattern);
 				if (arrMatches != null) {
 					matchedString = arrMatches[1];
 					rePattern = new RegExp(/(\d+-\d+)/);
@@ -198,7 +217,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 
 				// case 4:
 				rePattern = new RegExp(/.*tổng tỷ số(.*)/);
-				arrMatches = stringList[i].match(rePattern);
+				arrMatches = line.match(rePattern);
 				if (arrMatches != null) {
 					matchedString = arrMatches[1];
 					rePattern = new RegExp(/(\d+-\d+)/);
@@ -218,7 +237,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 
 			}
 		}
-		//console.log("------line ",i,stringList[i]);
+		//console.log("------line ",i,line);
 
 	}
 
