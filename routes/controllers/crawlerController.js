@@ -187,14 +187,14 @@ var parserVideoHTML_24H = function(stringHTML) {
 
 				if (case1_3_5 !=  0) {
 					matchedString = arrMatches[1];
-					rePattern = new RegExp(/(\d+-\d+)/);
+					rePattern = new RegExp(/(\d+\s*-\s*\d+)/);
 					arrTeamMatches = matchedString.match(rePattern);
 
 					if (results.score == null) {
 						if (arrTeamMatches != null) {
-							results.score = arrTeamMatches[1];
+							results.score = arrTeamMatches[1].replace(/ /gi,"");
 						} else {
-							results.score = matchedString;
+							results.score = matchedString.replace(/ /gi,"");
 						}
 					}
 				}
@@ -204,11 +204,11 @@ var parserVideoHTML_24H = function(stringHTML) {
 				arrMatches = line.match(rePattern);
 				if (arrMatches != null) {
 					matchedString = arrMatches[1];
-					rePattern = new RegExp(/(\d+-\d+)/);
+					rePattern = new RegExp(/(\d+\s*-\s*\d+)/);
 					arrTeamMatches = matchedString.match(rePattern);
 
 					if (arrTeamMatches != null) {
-						results.finalscore = arrTeamMatches[1];
+						results.finalscore = arrTeamMatches[1].replace(/ /gi,"");
 					} else {
 						//results.finalscore = matchedString;
 					}
@@ -220,14 +220,14 @@ var parserVideoHTML_24H = function(stringHTML) {
 				arrMatches = line.match(rePattern);
 				if (arrMatches != null) {
 					matchedString = arrMatches[1];
-					rePattern = new RegExp(/(\d+-\d+)/);
+					rePattern = new RegExp(/(\d+\s*-\s*\d+)/);
 					arrTeamMatches = matchedString.match(rePattern);
 
 					if (arrTeamMatches != null) {
 						if (results.finalscore != null) {
-							results.score = results.finalscore;
+							results.score = results.finalscore.replace(/ /gi,"");
 						}
-						results.finalscore = arrTeamMatches[1];
+						results.finalscore = arrTeamMatches[1].replace(/ /gi,"");
 
 					} else {
 						//results.finalscore = matchedString;
