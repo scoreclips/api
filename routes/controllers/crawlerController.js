@@ -211,28 +211,28 @@ var parserVideoHTML_24H = function(stringHTML) {
 				// case 3: Tỷ số 1-6<br />
 				// case 4: Chung cuộc: 3-2 (tổng tỷ số 4-5 sau 2 lượt trận, Chelsea giành quyền vào bán kết)
 				// case 5: Kết quả 0-2
-				rePattern = new RegExp(/.*Tỉ số(.*)/);
+				rePattern = new RegExp(/.*Tỉ số(.*\d+\s*-\s*\d+.*)/);
 				arrMatches = line.match(rePattern);
 
 				var case1_3_5 = 0;
 				if (arrMatches != null) {
 					// case 1:
 					case1_3_5 = 1;
-					console.log("---score case1--",matchedString);
+					console.log("---score case1--",arrMatches[1]);
 				} else {
 					// case 3:
-					rePattern = new RegExp(/.*Tỷ số(.*)/);
+					rePattern = new RegExp(/.*Tỷ số(.*\d+\s*-\s*\d+.*)/);
 					arrMatches = line.match(rePattern);
 					if (arrMatches != null) {
 						case1_3_5 = 3;
-						console.log("---score case3--",matchedString);
+						console.log("---score case3--",arrMatches[1]);
 					} else {
 						// case 5
-						rePattern = new RegExp(/.*Kết quả:(.*)/);
+						rePattern = new RegExp(/.*Kết quả:(.*\d+\s*-\s*\d+.*)/);
 						arrMatches = line.match(rePattern);
 						if (arrMatches != null) {
 							case1_3_5 = 5;
-							console.log("---score case5--",matchedString);
+							console.log("---score case5--",arrMatches[1]);
 						} 
 					}
 				}
@@ -252,7 +252,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 				}
 
 				// case 1+2:
-				rePattern = new RegExp(/.*Chung cuộc(.*)/);
+				rePattern = new RegExp(/.*Chung cuộc(.*\d+\s*-\s*\d+.*)/);
 				arrMatches = line.match(rePattern);
 				if (arrMatches != null) {
 					matchedString = arrMatches[1];
@@ -268,7 +268,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 				}
 
 				// case 4:
-				rePattern = new RegExp(/.*tổng tỷ số(.*)/);
+				rePattern = new RegExp(/.*tổng tỷ số(.*\d+\s*-\s*\d+.*)/);
 				arrMatches = line.match(rePattern);
 				if (arrMatches != null) {
 					matchedString = arrMatches[1];
@@ -320,6 +320,7 @@ exports.crawler_24H = function() {
 
 	var crawler = Crawler.crawl(root);
 
+	var checkedIndex = [];
 	crawler.interval = 1000;
 	// crawler.filterByDomain = "c297";
 	// crawler.scanSubdomains = true;
@@ -353,6 +354,7 @@ exports.crawler_24H = function() {
 			AM.findByMultipleFields(searchKeys,function(e, o1) {
 				if (o1.length == 0) {
 					var url = o.sourceURL;
+					// get shortent url from bitly
 					getShortentUrl_bitly(url,function(e, shortenUrl) {
 						console.log('---sourceURL= ' + url + 'shorten url = ' + shortenUrl);
 						if (e) {
@@ -360,12 +362,18 @@ exports.crawler_24H = function() {
 						} else {
 							o.sourceURL = shortenUrl;
 						}
-						// save to db
-						console.log("--------new",o1);
-						var jsonDate = now.toJSON();
-						o.uptime = jsonDate;
-						AM.insertData(tableDB,o,function(e, o2) {
-						});
+
+						// check url exit
+						var boolCheck = checkedIndex.indexOf(o.sourceURL);
+						if (boolCheck == -1) {
+							checkedIndex.push(o.sourceURL);	
+							// save to db
+							console.log("--------new",o1,checkedIndex);
+							var jsonDate = now.toJSON();
+							o.uptime = jsonDate;
+							AM.insertData(tableDB,o,function(e, o2) {
+							});
+						}
 					});
 					
 				} else {
