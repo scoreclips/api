@@ -2,12 +2,64 @@ var    	AM = require('../modules/crawlerModule');
 var    	aigoDefine = require('../configs/define');
 var 	moment = require('moment');
 var 	Crawler = require("simplecrawler");
+var 	request = require('request');
+
+var		bitly_username = 'aigogroup'; 	
+var 	bitly_apikey   = 'R_d0a7a46663ae22d76c35c4546bc7f049';
+
+
+var parse = function (str) {
+    var args = [].slice.call(arguments, 1),
+        i = 0;
+
+    return str.replace(/%s/g, function() {
+        return args[i++];
+    });
+}
+
+var getShortentUrl_bitly = function(url,callback)
+{
+	//url = 'http%3A%2F%2Fbetaworks.com%2F';
+	var requestUrl = parse('http://api.bitly.com/v3/shorten?login=%s&apiKey=%s&longUrl=%s&format=json',bitly_username,bitly_apikey,url); 
+	//console.log(requestUrl);
+	request(requestUrl, function (error, response, body) {
+  		if (!error && response.statusCode == 200) {
+  			var o = JSON.parse(body);
+  			var data = o.data;
+  			//console.log(data.url) // Print the google web page.
+  			callback(null,data.url);
+  		} else {
+  			callback(error,undefined);
+  		}
+	})
+	
+};
+
+
+// TESTING
+// var url = 'http://hcm.24h.com.vn/bong-da/chelsea-swansea-thang-loi-nhe-nhang-c48a538896.html';
+// console.log(url);
+// var requestUrl = parse('http://api.bitly.com/v3/shorten?login=%s&apiKey=%s&longUrl=%s&format=json',bitly_username,bitly_apikey,url); 
+// 	console.log(requestUrl);
+// 	request(requestUrl, function (error, response, body) {
+//   		if (!error && response.statusCode == 200) {
+//   			var o = JSON.parse(body);
+//   			var data = o.data;
+//   			console.log(data.url) // Print the google web page.
+//   			callback(null,body);
+//   		} else {
+//   			console.log(error);
+//   		}
+//   	});
+// getShortentUrl_bitly(url,function(e, o1) {
+// 	console.log(o1)
+// });
+
+
 
 
 
 //// NOTE MAY BE USED RSS: http://www.24h.com.vn/upload/rss/videobanthang.rss
-
-
 
 //////////////////--Helper--//////////////////
 var cleanHTMLString = function(inputString) {
@@ -294,30 +346,42 @@ exports.crawler_24H = function() {
 
 	    if (o != null) {
 		    var searchKeys = {};
-		    searchKeys.sourceURL = o.sourceURL;
+		    //searchKeys.sourceURL = o.sourceURL;
+		    searchKeys.teams = o.teams;
+		    searchKeys.date = o.date;
 			//searchKeys.videoclips = undefined;
 			AM.findByMultipleFields(searchKeys,function(e, o1) {
 				if (o1.length == 0) {
-					// save to db
-					console.log("--------new",o1);
-					var jsonDate = now.toJSON();
-					o.uptime = jsonDate;
-					AM.insertData(tableDB,o,function(e, o) {
+					var url = o.sourceURL;
+					getShortentUrl_bitly(url,function(e, shortenUrl) {
+						console.log('---sourceURL= ' + url + 'shorten url = ' + shortenUrl);
+						if (e) {
+							// do nothing
+						} else {
+							o.sourceURL = shortenUrl;
+						}
+						// save to db
+						console.log("--------new",o1);
+						var jsonDate = now.toJSON();
+						o.uptime = jsonDate;
+						AM.insertData(tableDB,o,function(e, o2) {
+						});
 					});
+					
 				} else {
 					// already had video info
 					// update video list
-					o1.videoclips = o.videoclips;
-					o1.score = o.score;
-					o1.finalscore = o.finalscore;
-					o1.date = o.date;
-					o1.desciptions = o.desciptions;
-					o1.teams = o.teams;
-					o1.team1 = o.team1;
-					o1.team2 = o.team2;
-					console.log("c-updating",e,o,o1);
-					AM.saveData(tableDB,o1,function(e, o2) {
-					});
+					// o1.videoclips = o.videoclips;
+					// o1.score = o.score;
+					// o1.finalscore = o.finalscore;
+					// o1.date = o.date;
+					// o1.desciptions = o.desciptions;
+					// o1.teams = o.teams;
+					// o1.team1 = o.team1;
+					// o1.team2 = o.team2;
+					// console.log("c-updating",e,o,o1);
+					// AM.saveData(tableDB,o1,function(e, o2) {
+					// });
 				}
 			});
 		}
