@@ -67,9 +67,9 @@ var cleanHTMLString = function(inputString) {
 	
 	var result = inputString;
 	
-	result = inputString.replace(/amp;/gi,"");
-	result = inputString.replace(/\&quot;/gi,"\"");
-	result = inputString.replace(/\&quot;/gi,"\"");
+	result = result.replace(/\&amp;/gi,"\&");
+	result = result.replace(/\&quot;/gi,"\"");
+	result = result.replace(/\&quot;/gi,"\"");
 
 
 	return result;
