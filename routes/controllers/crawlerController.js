@@ -148,12 +148,21 @@ var parserVideoHTML_24H = function(stringHTML) {
 		// http://hcm.24h.com.vn/bong-da/newcastle-benfica-quyet-tam-cao-do-c48a534673.html
 		// <meta content="Newcastle – Benfica: Quyết tâm cao độ" itemprop="headline"/> 
 		// <meta content="Furth – Dortmund: Cảnh báo Mourinho" itemprop="headline"/> 
-
+		var rePattern = new RegExp(/.*<meta content=\"(.*)\" itemprop="headline"\/>/);
+		
+		// or 
+		//<h1 class="baiviet-title">Newcastle – Benfica: Quyết tâm cao độ			</h1>
+		var rePattern_v0826 = new RegExp(/.*baiviet-title.*\">(.*)<\/h1>/);
+		
 		// or 
 		// <meta content="Ro vẩu lốp bóng top 10 bàn thắng đẹp tuần" itemprop="headline"/> 
-		var rePattern = new RegExp(/.*<meta content=\"(.*)\" itemprop="headline"\/>/);
+		
 		var line = cleanHTMLString(stringList[i]);
 		var arrMatches = line.match(rePattern);
+
+		if (arrMatches == null) {
+				arrMatches = line.match(rePattern_v0826);
+		}
 
 
 		if (arrMatches != null) {
