@@ -90,11 +90,11 @@ var parserVideoURL_24H = function(stringURL) {
 
 		var rePattern = new RegExp(/.*videoclip\/(.*)\/(.*).mp4/);
 		var arrMatches = stringList[i].match(rePattern);
-		//console.log("-----",stringList[i]);
+		console.log("-----",stringList[i]);
 
 		// url
 		var url = arrMatches[0];
-		//console.log("-----",url);
+		console.log("-----",url);
 
 		// data
 		var date = arrMatches[1];
@@ -103,16 +103,16 @@ var parserVideoURL_24H = function(stringURL) {
 		// clean up name of video 
 		//  - remove _vs_
 		vname = vname.replace(/_vs_/gi,"_");
-		//console.log("-----",vname);
+		console.log("-----",vname);
 		//  - remove _mp4_
 		vname = vname.replace(/_mp4_/gi,"_");
-		//console.log("-----",vname);
+		console.log("-----",vname);
 
 		// get first name
 		var teamList = vname.split('_');
 		var team1 = teamList[0];
 		var team2 = teamList[1];
-		//console.log("-----",team1,team2);
+		console.log("-----",team1,team2);
 
 		
 		if (i == 0) {
@@ -140,6 +140,9 @@ var parserVideoHTML_24H = function(stringHTML) {
 	results.source = '24h.vn';
 	var videoclips = [];
 	var stringList = stringHTML.split('\n');
+
+	//console.log("---------stringHTML=",stringHTML);
+
 	for (var i = 0; i < stringList.length; i++) {
 		
 		//var videoinfo = {};
@@ -151,8 +154,8 @@ var parserVideoHTML_24H = function(stringHTML) {
 		var rePattern = new RegExp(/.*<meta content=\"(.*)\" itemprop="headline"\/>/);
 		
 		// or 
-		//<h1 class="baiviet-title">Newcastle – Benfica: Quyết tâm cao độ			</h1>
-		var rePattern_v0826 = new RegExp(/.*baiviet-title.*\">(.*)<\/h1>/);
+		//<h1 class="baiviet-title"> Newcastle – Benfica: Quyết tâm cao độ			</h1>
+		var rePattern_v0826 = new RegExp(/.*baiviet-title.*\s*\>\s*(.*)<\/h1>/);
 		
 		// or 
 		// <meta content="Ro vẩu lốp bóng top 10 bàn thắng đẹp tuần" itemprop="headline"/> 
@@ -161,11 +164,12 @@ var parserVideoHTML_24H = function(stringHTML) {
 		var arrMatches = line.match(rePattern);
 
 		if (arrMatches == null) {
-				arrMatches = line.match(rePattern_v0826);
+			arrMatches = line.match(rePattern_v0826);
 		}
 
-
+		
 		if (arrMatches != null) {
+			console.log("------rePattern_v0826",arrMatches);
 			var matchedString = arrMatches[1];
 			// get team1 team2 
 			rePattern = new RegExp(/(.*):\s*(.*)/);
@@ -193,8 +197,9 @@ var parserVideoHTML_24H = function(stringHTML) {
 
 			// clips
 			//flashWrite("/js/player24H2.swf?cID=297&file=http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_01.mp4,http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_02.mp4,http://video-hn.24hstatic.com/upload/2-2013/videoclip/2013-04-13/Arsenal_vs_Norwich_03.mp4&",500,447, "/", "http://anh.24h.com.vn/upload/2-2012/images/2012-05-21/24h_bongda_527x298.swf", "/");
+			//24/11/2013 - flashWrite("?cID=48&region=HCM&static_domain=http://stream08.24h.com.vn:8008/&file=http://stream08.24h.com.vn:8008/upload/2-2013/videoclip/2013-04-12/Newcastle_Vs_Benfica_001.mp4,http://stream08.24h.com.vn:8008/upload/2-2013/videoclip/2013-04-12/Newcastle_Vs_Benfica_002.mp4&",418,314, '/', 'http://stream08.24h.com.vn:8008/upload/4-2013/images/2013-11-22/1385089347-24hbong.swf', 'http://stream08.24h.com.vn:8008/upload/4-2013/images/2013-11-07/1383810427-thaiminh.flv');
 			// url
-			rePattern = new RegExp(/.*flashWrite\(\"\/js\/player24H2.swf\?cID=297.*file=(.*)/);
+			rePattern = new RegExp(/.*flashWrite\(.*file=(.*)/);
 			arrMatches = line.match(rePattern);
 
 			if (arrMatches != null) {
@@ -202,6 +207,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 				var clipList = arrMatches[1].split(',');
 				for (var clipIndex = 0; clipIndex < clipList.length; clipIndex++) {
 					
+					// Get Date from video clip
 					rePattern = new RegExp(/(http.*videoclip\/(.*)\/(.*).mp4).*/);
 					arrMatches = clipList[clipIndex].match(rePattern);
 
@@ -303,7 +309,7 @@ var parserVideoHTML_24H = function(stringHTML) {
 	}
 
 
-	//console.log("-------result1111:",results);
+	console.log("-------result1111:",results);
 	if (videoclips.length > 0) {
 		results.videoclips = videoclips;
 		//console.log("-------parserVideoHTML_24H--results:",results);
